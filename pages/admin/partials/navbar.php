@@ -1,18 +1,3 @@
-<?php 
-// Break down the URL path
-$path = explode('/', $_SERVER['REQUEST_URI']);
-
-// Get the last element of the array
-$lastElement = end($path);
-
-// Explode the last element by '.'
-$parts = explode('.', $lastElement);
-
-// Get the first part
-$url = $parts[0];
-
-?>
-
 <nav class="navbar navbar-dark navbar-expand-sm fixed-top">
     <div class="container">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#Navbar">

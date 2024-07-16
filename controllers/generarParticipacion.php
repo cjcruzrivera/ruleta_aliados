@@ -1,109 +1,42 @@
 <?php
-
-ini_set("display_errors", true);
 require_once "../db/conexion.php";
 
-function get_boleta()
-{
-    global $conexion;
+function generarCodigo($nombre, $agencia, $idParticipacion) {
+    $nombreParte = strtoupper(substr($nombre, 0, 2));
+    $agenciaParte = strtoupper(substr($agencia, 0, 2));
+    return $nombreParte . $agenciaParte . $idParticipacion;
+}
 
-    $query = "SELECT random.RandomValue
-    FROM (SELECT FLOOR( RAND() * (999-0) + 0) as RandomValue) as random
-    WHERE random.RandomValue NOT IN (SELECT boleta FROM participaciones)
-    LIMIT 1";
-    $consulta = mysqli_query($conexion, $query) or die(mysqli_error($conexion));
-    $boleta = mysqli_fetch_row($consulta);
-    
-    while(!$boleta){
-        $consulta = mysqli_query($conexion, $query) or die(mysqli_error($conexion));
-        $boleta = mysqli_fetch_row($consulta);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $cedula = $_POST['cedula'];
+    $nombre = $_POST['nombre'];
+    $agencia = $_POST['agencia'];
+
+    // Comprobar si el participante ya existe
+    $consulta_participante = mysqli_query($conexion, "SELECT * FROM participantes WHERE cedula = '$cedula'");
+    if (mysqli_num_rows($consulta_participante) === 0) {
+        // Insertar nuevo participante
+        $insertar_participante = "INSERT INTO participantes (cedula, fullname, agencia) VALUES ('$cedula', '$nombre', '$agencia')";
+        mysqli_query($conexion, $insertar_participante);
     }
 
-    return $boleta[0];
+    // Insertar nueva participación
+    $fechaGeneracion = date('Y-m-d');
+    $insertar_participacion = "INSERT INTO participaciones (cedula_participante, fecha_generacion) VALUES ('$cedula', '$fechaGeneracion')";
+    mysqli_query($conexion, $insertar_participacion);
+
+    $idParticipacion = mysqli_insert_id($conexion);
+
+    // Obtener URL base del sitio
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    $baseURL = $protocol . "://" . $host;
+
+    // Generar URL
+    $code = generarCodigo($nombre, $agencia, $idParticipacion);
+    $url = $baseURL . "/aniversario?sorteo=" . $code;
+
+    // Retornar URL como respuesta JSON
+    echo json_encode(['url' => $url]);
 }
-
-$data = json_decode($_POST['data']);
-$reserva = $data->reserva;
-
-$query = "SELECT * FROM participaciones WHERE reserva = '$reserva'";
-
-$consulta = mysqli_query($conexion, $query) or die(mysqli_error($conexion));
-if (mysqli_num_rows($consulta) > 0) {
-    $response = array(
-        "success" => false,
-        "error" => "Ya hay una participación registrada con esta reserva"
-    );
-    print_r(json_encode($response));
-    exit;
-}
-
-
-if ($_FILES['file']['size'] != 0) {
-    $rutaArchivo = "../pages/files/";
-
-    $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-    $rutaArchivo .= $reserva . "." . $extension;
-    if ($extension != "pdf" && $extension != "PDF") {
-        $response = array(
-            "success" => false,
-            "error" => "Debe cargar archivos con extensión PDF (.pdf, .PDF)."
-        );
-        print_r(json_encode($response));
-        exit;
-    } else {
-        if (move_uploaded_file($_FILES['file']['tmp_name'], $rutaArchivo)) {
-            $carga = true;
-        } else {
-            $response = array(
-                "success" => false,
-                "error" => "Error al subir archivo PDF al servidor."
-            );
-            print_r(json_encode($response));
-            exit;
-        }
-    }
-} else {
-    $response = array(
-        "success" => false,
-        "error" => "Error con archivo cargado.",
-    );
-    print_r(json_encode($response));
-    exit;
-}
-
-$liquidacion = str_replace("/pages", "", $rutaArchivo);
-
-$cedula = $data->cedula;
-$query_validation = "SELECT * FROM participantes WHERE cedula = '$cedula'";
-
-$consulta = mysqli_query($conexion, $query_validation) or die(mysqli_error($conexion));
-if (mysqli_num_rows($consulta) == 0) {
-    $query_insert_participante = "INSERT INTO `participantes` (`cedula`, `fullname`, `email`, `telefono`, `agencia`)
-    VALUES ('$cedula', '$data->fullname', '$data->email', '$data->telefono', '$data->agencia')";
-    $consulta = mysqli_query($conexion, $query_insert_participante) or die(mysqli_error($conexion));
-}
-
-$message = "";
-$boleta = get_boleta();
-$query_insert_participacion = "INSERT INTO `participaciones` (`cedula`, `id_hotel`, `id_asesor`, `fecha`, `reserva`, `boleta`, `url_liquidacion`, `estado`)
-                                                      VALUES ('$cedula', '$data->hotel',  '$data->asesor',CURDATE(), '$reserva',$boleta, '$liquidacion', 'Pendiente de Verificar')";
-
-$consulta = mysqli_query($conexion, $query_insert_participacion) or die(mysqli_error($conexion));
-
-$message .= "Participación registrada con éxito. Boleta #" . str_pad($boleta, 3, '0', STR_PAD_LEFT). "\n";
-if ($data->destacado) {
-    $boleta2 = get_boleta();
-    $query_insert_participacion2 = "INSERT INTO `participaciones` (`cedula`, `id_hotel`, `id_asesor`, `fecha`, `reserva`, `boleta`, `url_liquidacion`, `estado`)
-                                                      VALUES ('$cedula', '$data->hotel',  '$data->asesor',CURDATE(), '$reserva',$boleta2, '$liquidacion', 'Pendiente de Verificar')";
-    $consulta = mysqli_query($conexion, $query_insert_participacion2) or die(mysqli_error($conexion));
-    
-    $message .= "Participación adicional registrada con éxito. Boleta #" . str_pad($boleta2, 3, '0', STR_PAD_LEFT);
-}
-
-
-$response = array(
-    "success" => true,
-    "message" => $message
-);
-
-print_r(json_encode($response));
+?>

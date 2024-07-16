@@ -65,19 +65,6 @@ VALUES (
 
 -- ------------------------------------------------------
 
-DROP TABLE IF EXISTS `participantes`;
-CREATE TABLE `participantes` (
-    `cedula` varchar(30) NOT NULL,
-    `fullname` varchar(70) NOT NULL,
-    `agencia` varchar(100) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
--- Indices de la tabla `participantes`
---
-ALTER TABLE `participantes`
-ADD PRIMARY KEY (`cedula`);
-
--- --------------------------------------------------------
-
 DROP TABLE IF EXISTS `premios`;
 CREATE TABLE `premios` (
     `id` int(10) NOT NULL,
@@ -110,6 +97,18 @@ VALUES ('Marca maletas', 5,'/assets/images/maletas.jpg'),
 
 -- --------------------------------------------------------
 
+DROP TABLE IF EXISTS `participantes`;
+CREATE TABLE `participantes` (
+    `cedula` varchar(30) NOT NULL,
+    `fullname` varchar(70) NOT NULL,
+    `agencia` varchar(100) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+-- Indices de la tabla `participantes`
+--
+ALTER TABLE `participantes`
+ADD PRIMARY KEY (`cedula`);
+
+-- --------------------------------------------------------
 DROP TABLE IF EXISTS `participaciones`;
 CREATE TABLE `participaciones` (
     `id` int(10) NOT NULL,

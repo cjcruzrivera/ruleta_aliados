@@ -9,8 +9,12 @@ if (!$_SESSION['logged']) {
 require_once "../../db/conexion.php";
 $name = $_SESSION['fullname'];
 
-$participantes_query = "SELECT *
-                    FROM participantes";
+// Obtener URL base del sitio
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+$baseURL = $protocol . "://" . $host. "/aniversario";
+
+$participantes_query = "SELECT * FROM participantes";
 $consulta_participantes = mysqli_query($conexion, $participantes_query) or die(mysqli_error($conexion));
 $participantes = [];
 while ($registro = mysqli_fetch_array($consulta_participantes)) {
@@ -20,6 +24,7 @@ while ($registro = mysqli_fetch_array($consulta_participantes)) {
 $html_participaciones = "";
 
 $query = "SELECT
+            pa.id,
             pa.fecha_generacion AS generado,
             p.cedula,
             p.fullname as nombre_participante,
@@ -47,23 +52,24 @@ while ($registro = mysqli_fetch_array($consulta)) {
     $cedula = $registro['cedula'];
     $nombre_participante = $registro['nombre_participante'];
     $agencia_participante = $registro['agencia_participante'];
-    $premio = $registro['premio'];
+    $url_participacion = $baseURL . "?sorteo=" . strtoupper(substr($nombre_participante, 0, 2)) . strtoupper(substr($agencia_participante, 0, 2)) . $registro['id'];
+    $link_participacion = "<a href='$url_participacion' target='_blank'>$url_participacion</a>";
+    $premio = $registro['premio'] != 'PREMIO NO SORTEADO AUN' ? $registro['premio'] : $registro['premio'] . '<br>' . $link_participacion;
     $sorteado = $registro['sorteado'];
     $url_img = $registro['url_img'];
-
+    $img = $url_img ? "<img src='$url_img' style='width: 100px; height: 100px;'>" : "";
     $html_participaciones .= "<tr>
                                 <td>$generado</td>
                                 <td>$cedula</td>
                                 <td>$nombre_participante</td>
                                 <td>$agencia_participante</td>
                                 <td>$premio</td>
-                                <td><img src='$url_img' style='width: 100px; height: 100px;'></td>
+                                <td>$img</td>
                                 <td>$sorteado</td>
                             </tr>";
 }
 $html_participaciones = $html_participaciones == "" ? "<tr><td colspan='7'>No hay participaciones</td></tr>" : $html_participaciones;
 ?>
-
 
 <!doctype html>
 <html lang="es">
@@ -76,7 +82,7 @@ $html_participaciones = $html_participaciones == "" ? "<tr><td colspan='7'>No ha
     <div class="container pt-5" style="max-width: 1317px !important;">
         <div class="row">
             <div class="col-md-6">
-                <button type="button" class="btn btn-info" onclick="generar">GENERAR PARTICIPACIÓN</button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#generarModal">GENERAR PARTICIPACIÓN</button>
             </div>
         </div>
         <div class="row pt-3">
@@ -84,18 +90,49 @@ $html_participaciones = $html_participaciones == "" ? "<tr><td colspan='7'>No ha
                 <table class="table table-striped" id="table_id">
                     <thead>
                         <tr>
-                            <th>Generado</th>
+                            <th>Generado el</th>
                             <th>Cédula</th>
                             <th>Nombre</th>
                             <th>Agencia</th>
                             <th colspan="2">Premio</th>
-                            <th>Sorteado</th>
+                            <th>Sorteado el</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php echo $html_participaciones; ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="generarModal" tabindex="-1" role="dialog" aria-labelledby="generarModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="generarModalLabel">Generar Participación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formGenerar">
+                        <div class="form-group">
+                            <label for="cedula">Cédula</label>
+                            <input type="text" class="form-control" id="cedula" name="cedula" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="agencia">Agencia</label>
+                            <input type="text" class="form-control" id="agencia" name="agencia" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="btnGenerar">Generar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -109,6 +146,44 @@ $html_participaciones = $html_participaciones == "" ? "<tr><td colspan='7'>No ha
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        var participantes = <?php echo json_encode($participantes); ?>;
+
+        $('#cedula').on('blur', function() {
+            var cedula = $(this).val();
+            if (participantes[cedula]) {
+                $('#nombre').val(participantes[cedula].fullname);
+                $('#agencia').val(participantes[cedula].agencia);
+            }
+        });
+
+        $('#btnGenerar').on('click', function() {
+            var cedula = $('#cedula').val();
+            var nombre = $('#nombre').val();
+            var agencia = $('#agencia').val();
+
+            $.ajax({
+                url: '../../controllers/generarParticipacion.php',
+                type: 'POST',
+                data: {
+                    cedula: cedula,
+                    nombre: nombre,
+                    agencia: agencia
+                },
+                success: function(response) {
+                    response = JSON.parse(response);
+                    Swal.fire({
+                        title: 'Participación generada correctamente',
+                        text: 'Compartir esta URL: ' + response.url,
+                        icon: 'success'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                }
+            });
+        });
+
         $(document).ready(function() {
             $('#table_id').DataTable({
                 "language": {
@@ -134,7 +209,6 @@ $html_participaciones = $html_participaciones == "" ? "<tr><td colspan='7'>No ha
                     "targets": 1
                 }]
             });
-
         });
     </script>
 
