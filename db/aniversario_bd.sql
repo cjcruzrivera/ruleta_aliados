@@ -82,18 +82,18 @@ MODIFY `id` int(10) NOT NULL AUTO_INCREMENT,
 COMMIT;
 
 INSERT INTO `premios` (`nombre`, `cantidad`, `url_img`)
-VALUES ('Marca maletas', 5,'/assets/images/maletas.jpg'),
-    ('Gafas de sol', 2,'/assets/images/sol.jpg'),
-    ('Gorras', 2,'/assets/images/Gorras.jpg'),
-    ('Estuche sumergible', 4,'/assets/images/sumergible.jpg'),
-    ('3% DTO en porcion terrestre nacional', 5,'/assets/images/3nacional.jpg'),
-    ('4% DTOC en porcion terrestre nacional', 5,'/assets/images/4nacional.jpg'),
-    ('5% DTOC en porcion terrestre nacional', 5,'/assets/images/5nacional.jpg'),
-    ('5% DTO en porcion terrestre internacional', 5,'/assets/images/5internacional.jpg'),
-    ('7% DTO en porcion terrestre internacional', 5,'/assets/images/7internacional.jpg'),
-    ('8% DTO en porcion terrestre internacional', 5,'/assets/images/8internacional.jpg'),
-    ('10% DTO en porcion terrestre internacional', 5,'/assets/images/10internacional.jpg'),
-    ('Termos', 3,'/assets/images/Termos.jpg');
+VALUES ('Marca maletas', 5,'../../assets/images/maletas.jpg'),
+    ('Gafas de sol', 2,'../../assets/images/sol.jpg'),
+    ('Gorras', 2,'../../assets/images/Gorras.jpg'),
+    ('Funda sumergible', 4,'../../assets/images/sumergible.jpg'),
+    ('3% DTO PT NAL', 5,'../../assets/images/3nacional.jpg'),
+    ('4% DTO PT NAL', 5,'../../assets/images/4nacional.jpg'),
+    ('5% DTO PT NAL', 5,'../../assets/images/5nacional.jpg'),
+    ('5% DTO PT INT', 5,'../../assets/images/5internacional.jpg'),
+    ('7% DTO PT INT', 5,'../../assets/images/7internacional.jpg'),
+    ('8% DTO PT INT', 5,'../../assets/images/8internacional.jpg'),
+    ('10% DTO PT INT', 5,'../../assets/images/10internacional.jpg'),
+    ('Termos', 3,'../../assets/images/Termos.jpg');
 
 -- --------------------------------------------------------
 

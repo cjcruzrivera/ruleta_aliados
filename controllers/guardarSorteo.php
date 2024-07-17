@@ -10,6 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Actualizar participación con el premio y fecha de sorteo
     $actualizar_participacion = "UPDATE participaciones SET id_premio = $id_premio, fecha_sorteo = '$fecha_sorteo' WHERE id = $id_participacion";
+    $actualizar_premios = "UPDATE premios SET cantidad = cantidad - 1 WHERE id = $id_premio";
+
+    if (!mysqli_query($conexion, $actualizar_premios)) {
+        echo json_encode(['status' => 'error', 'message' => 'Error al guardar el sorteo: ' . mysqli_error($conexion)]);
+    }
     
     if (mysqli_query($conexion, $actualizar_participacion)) {
         echo json_encode(['status' => 'success', 'message' => 'Sorteo guardado correctamente']);
