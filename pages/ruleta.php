@@ -1,5 +1,16 @@
 <?php
 
+$validar_participacion = "SELECT * 
+FROM participaciones
+INNER JOIN participantes ON participaciones.cedula_participante = participantes.cedula
+WHERE CONCAT(SUBSTRING(participantes.fullname, 1, 2), SUBSTRING(participantes.agencia, 1, 2), participaciones.id) = '$code_participacion';";
+
+$consulta_validar_participacion = mysqli_query($conexion, $validar_participacion) or die(mysqli_error($conexion));
+
+if (mysqli_num_rows($consulta_validar_participacion) == 0) {
+    header('location: ./');
+}
+
 $premios_disponibles = "SELECT * FROM premios WHERE cantidad >= 1";
 
 $consulta_premios = mysqli_query($conexion, $premios_disponibles) or die(mysqli_error($conexion));

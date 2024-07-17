@@ -93,7 +93,7 @@ VALUES ('Marca maletas', 5,'../../assets/images/maletas.jpg'),
     ('7% DTO PT INT', 5,'../../assets/images/7internacional.jpg'),
     ('8% DTO PT INT', 5,'../../assets/images/8internacional.jpg'),
     ('10% DTO PT INT', 5,'../../assets/images/10internacional.jpg'),
-    ('Termos', 3,'../../assets/images/Termos.jpg');
+    ('Termos', 3,'../../assets/images/Termos.jpeg');
 
 -- --------------------------------------------------------
 
