@@ -13,7 +13,7 @@ while ($registro = mysqli_fetch_array($consulta_premios)) {
 <html>
 
 <head>
-    <title>Aniversario Aliados 2024</title>
+    <title>Aniversario JE Tours 2024</title>
     <link rel="stylesheet" href="assets/css/main.css" type="text/css" />
     <link rel="shortcut icon" href="assets/images/iconlogo.png" type="image/x-icon">
     <script type="text/javascript" src="assets/js/Winwheel.min.js"></script>

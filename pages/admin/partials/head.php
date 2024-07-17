@@ -11,6 +11,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
     <link rel="shortcut icon" type="image/png" href="../../assets/images/iconlogo.png" />
-    <title>Sorteo Aliados Travel 2024</title>
+    <title>Aniversario JE Tours 2024</title>
 
 </head>
