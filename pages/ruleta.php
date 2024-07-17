@@ -17,7 +17,7 @@ while ($registro = mysqli_fetch_array($consulta_premios)) {
     <link rel="stylesheet" href="assets/css/main.css" type="text/css" />
     <link rel="shortcut icon" href="assets/images/iconlogo.png" type="image/x-icon">
     <script type="text/javascript" src="assets/js/Winwheel.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
